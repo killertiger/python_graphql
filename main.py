@@ -1,18 +1,36 @@
-from graphene import ObjectType, Schema, String
+from graphene import Field, Int, ObjectType, Schema, String
+
+
+class UserType(ObjectType):
+    id = Int()
+    name = String()
+    age = Int()
 
 
 class Query(ObjectType):
-    hello = String(name=String(default_value="world"))
+    user = Field(UserType, user_id=Int())
 
-    def resolve_hello(self, info, name):
-        return f"Hello {name}"
+    users = [
+        {"id": 1, "name": "Andy Doe", "age": 33},
+        {"id": 2, "name": "Andia Doe", "age": 34},
+        {"id": 3, "name": "Julie Sullivan", "age": 31},
+        {"id": 4, "name": "John Barber", "age": 29},
+    ]
+
+    def resolve_user(self, info, user_id):
+        matched_users = [user for user in Query.users if user["id"] == user_id]
+        return matched_users[0] if matched_users else None
 
 
 schema = Schema(query=Query)
 
 gql = '''
-{
-    hello(name: "graphql")
+query {
+    user(userId: 1) {
+        id
+        name
+        age
+    }
 }'''
 
 if __name__ == "__main__":
