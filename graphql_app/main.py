@@ -1,10 +1,26 @@
-from graphene import Schema, ObjectType, String
+from graphene import Field, Int, List, Schema, ObjectType, String
 from fastapi import FastAPI
 from starlette_graphene3 import (
     GraphQLApp,
     make_graphiql_handler,
     make_playground_handler,
 )
+
+
+class EmployerObject(ObjectType):
+    id = Int()
+    name = String()
+    contact_email = String()
+    industry = String()
+    jobs = List(lambda: JobObject)
+
+
+class JobObject(ObjectType):
+    id = Int()
+    title = String()
+    description = String()
+    employer_id = Int()
+    employer = Field(lambda: EmployerObject)
 
 
 class Query(ObjectType):
