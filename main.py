@@ -17,7 +17,8 @@ class Query(ObjectType):
         {"id": 4, "name": "John Barber", "age": 29},
     ]
 
-    def resolve_user(self, info, user_id):
+    @staticmethod
+    def resolve_user(root, info, user_id):
         matched_users = [user for user in Query.users if user["id"] == user_id]
         return matched_users[0] if matched_users else None
 
