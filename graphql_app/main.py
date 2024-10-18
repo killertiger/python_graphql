@@ -5,22 +5,40 @@ from starlette_graphene3 import (
     make_graphiql_handler,
     make_playground_handler,
 )
+from sqlalchemy import Column, Integer, String as saString, create_engine, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
+
+DB_URL = "postgresql+psycopg://postgres:postgres@localhost:5432/graphqldb"
+engine = create_engine(DB_URL)
+conn = engine.connect()
+
+Base = declarative_base()
 
 
-class EmployerObject(ObjectType):
-    id = Int()
-    name = String()
-    contact_email = String()
-    industry = String()
-    jobs = List(lambda: JobObject)
+class Employer(Base):
+    __tablename__ = "employers"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(saString)
+    contact_email = Column(saString)
+    industry = Column(saString)
+    jobs = relationship("Job", back_populates="employer")
 
 
-class JobObject(ObjectType):
-    id = Int()
-    title = String()
-    description = String()
-    employer_id = Int()
-    employer = Field(lambda: EmployerObject)
+class Job(Base):
+    __tablename__ = "jobs"
+    id = Column(Integer, primary_key=True)
+    title = Column(saString)
+    description = Column(saString)
+    employer_id = Column(Integer, ForeignKey("employers.id"))
+    employer = relationship("Employer", back_populates="jobs")
+
+
+Base.metadata.create_all(engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
 
 
 employers_data = [
@@ -90,6 +108,47 @@ jobs_data = [
 ]
 
 
+for employer in employers_data:
+    emp = Employer(**employer)
+    session.add(emp)
+
+
+for job in jobs_data:
+    session.add(Job(**job))
+
+session.commit()
+
+class EmployerObject(ObjectType):
+    id = Int()
+    name = String()
+    contact_email = String()
+    industry = String()
+    jobs = List(lambda: JobObject)
+
+    @staticmethod
+    def resolve_jobs(root, info):
+        return [job for job in jobs_data if job["employer_id"] == root["id"]]
+
+
+class JobObject(ObjectType):
+    id = Int()
+    title = String()
+    description = String()
+    employer_id = Int()
+    employer = Field(lambda: EmployerObject)
+
+    @staticmethod
+    def resolve_employer(root, info):
+        return next(
+            (
+                employer
+                for employer in employers_data
+                if employer["id"] == root["employer_id"]
+            ),
+            None,
+        )
+
+
 class Query(ObjectType):
     jobs = List(JobObject)
     employers = List(EmployerObject)
@@ -97,7 +156,8 @@ class Query(ObjectType):
     @staticmethod
     def resolve_jobs(root, info):
         return jobs_data
-    
+
+    @staticmethod
     def resolve_employers(root, info):
         return employers_data
 

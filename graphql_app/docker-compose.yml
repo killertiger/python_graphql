@@ -4,14 +4,15 @@ services:
   db:
     image: postgres
     environment:
-      - POSTGRES_PASSWORD="postgres"
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=graphqldb
     ports:
       - "5432:5432"
-  app:
-    container_name: "graphql_app"
-    build: .
-    volumes:
-      - .:/app
-    ports:
-      - 8000:8000
-    command: uvicorn main:app --reload
+  # app:
+  #   container_name: "graphql_app"
+  #   build: .
+  #   volumes:
+  #     - .:/app
+  #   ports:
+  #     - 8000:8000
+  #   command: uvicorn main:app --reload
