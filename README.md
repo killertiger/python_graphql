@@ -21,3 +21,10 @@ source venv/bin/activate
 ```bash
 python main.py
 ```
+
+# app
+
+# Running
+```bash
+uvicorn app.main:app --reload
+```
