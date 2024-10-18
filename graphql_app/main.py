@@ -35,11 +35,7 @@ class Job(Base):
     employer = relationship("Employer", back_populates="jobs")
 
 
-Base.metadata.create_all(engine)
-
 Session = sessionmaker(bind=engine)
-session = Session()
-
 
 employers_data = [
     {
@@ -108,15 +104,22 @@ jobs_data = [
 ]
 
 
-for employer in employers_data:
-    emp = Employer(**employer)
-    session.add(emp)
+def prepare_database():
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
 
+    session = Session()
 
-for job in jobs_data:
-    session.add(Job(**job))
+    for employer in employers_data:
+        emp = Employer(**employer)
+        session.add(emp)
 
-session.commit()
+    for job in jobs_data:
+        session.add(Job(**job))
+
+    session.commit()
+    session.close()
+
 
 class EmployerObject(ObjectType):
     id = Int()
@@ -165,6 +168,12 @@ class Query(ObjectType):
 schema = Schema(query=Query)
 
 app = FastAPI()
+
+
+@app.on_event("startup")
+def startup_event():
+    prepare_database()
+
 
 app.mount('/graphql-p', GraphQLApp(schema=schema, on_get=make_playground_handler()))
 
