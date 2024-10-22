@@ -1,4 +1,4 @@
-from graphene import Field, Int, Mutation, String
+from graphene import Boolean, Field, Int, Mutation, String
 
 from app.db.models import Employer
 from app.gql.types import EmployerObject
@@ -52,3 +52,23 @@ class UpdateEmployer(Mutation):
         session.refresh(employer)
         session.close()
         return UpdateEmployer(employer=employer)
+
+
+class DeleteEmployer(Mutation):
+    class Arguments:
+        id = Int(required=True)
+
+    success = Boolean()
+
+    @staticmethod
+    def mutate(root, info, id):
+        session = Session()
+        employer = session.query(Employer).filter(Employer.id == id).first()
+
+        if not employer:
+            raise Exception("Employer not found")
+
+        session.delete(employer)
+        session.commit()
+        session.close()
+        return DeleteEmployer(success=True)

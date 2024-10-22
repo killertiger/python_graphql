@@ -85,3 +85,26 @@ fragment jobFields on JobObject {
 	id title description employerId
 }
 ```
+
+Update employer:
+```
+mutation {
+  updateEmployer(employerId: 1, name: "new name", contactEmail: "newemail@domain.code", industry: "Any industry") {
+    employer {
+      id
+      name
+      contactEmail
+      industry
+    }
+  }
+}
+```
+
+Delete employer:
+```
+mutation {
+  deleteEmployer(id: 1) {
+    success
+  }
+}
+```

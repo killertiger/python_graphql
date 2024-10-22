@@ -1,6 +1,6 @@
 from graphene import ObjectType
 
-from app.gql.employer.mutations import AddEmployer, UpdateEmployer
+from app.gql.employer.mutations import AddEmployer, DeleteEmployer, UpdateEmployer
 from app.gql.job.mutations import AddJob, UpdateJob, DeleteJob
 
 
@@ -10,3 +10,4 @@ class Mutation(ObjectType):
     delete_job = DeleteJob.Field()
     add_employer = AddEmployer.Field()
     update_employer = UpdateEmployer.Field()
+    delete_employer = DeleteEmployer.Field()
