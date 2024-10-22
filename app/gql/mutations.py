@@ -1,4 +1,4 @@
-from graphene import Field, Int, Mutation, ObjectType, String
+from graphene import Boolean, Field, Int, Mutation, ObjectType, String
 from sqlalchemy.orm import joinedload
 
 from app.db.models import Job
@@ -58,6 +58,27 @@ class UpdateJob(Mutation):
         return UpdateJob(job=job)
 
 
+class DeleteJob(Mutation):
+    class Arguments:
+        id = Int(required=True)
+
+    success = Boolean()
+
+    @staticmethod
+    def mutate(root, info, id):
+        session = Session()
+        job = session.query(Job).filter(Job.id == id).first()
+
+        if not job:
+            raise Exception("Job not found")
+
+        session.delete(job)
+        session.commit()
+        session.close()
+        return DeleteJob(success=True)
+
+
 class Mutation(ObjectType):
     add_job = AddJob.Field()
     update_job = UpdateJob.Field()
+    delete_job = DeleteJob.Field()
