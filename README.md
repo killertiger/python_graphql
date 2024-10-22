@@ -64,3 +64,24 @@ mutation {
   }
 }
 ```
+
+# Example queries:
+
+Query using Fragment
+```
+query {
+  employer(id: 2) {
+    ...employerFields
+  }
+}
+
+fragment employerFields on EmployerObject {
+  id name contactEmail industry jobs {
+    ...jobFields
+  }
+}
+
+fragment jobFields on JobObject { 
+	id title description employerId
+}
+```
