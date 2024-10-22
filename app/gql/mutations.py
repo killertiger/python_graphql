@@ -1,8 +1,8 @@
 from graphene import Boolean, Field, Int, Mutation, ObjectType, String
 from sqlalchemy.orm import joinedload
 
-from app.db.models import Job
-from app.gql.types import JobObject
+from app.db.models import Job, Employer
+from app.gql.types import EmployerObject, JobObject
 from app.db.database import Session
 
 
@@ -78,7 +78,26 @@ class DeleteJob(Mutation):
         return DeleteJob(success=True)
 
 
+class AddEmployer(Mutation):
+    class Arguments:
+        name = String(required=True)
+        contact_email = String(required=True)
+        industry = String(required=True)
+
+    employer = Field(lambda: EmployerObject)
+
+    @staticmethod
+    def mutate(root, info, name, contact_email, industry):
+        session = Session()
+        employer = Employer(name=name, contact_email=contact_email, industry=industry)
+        session.add(employer)
+        session.commit()
+        session.refresh(employer)
+        return AddEmployer(employer=employer)
+
+
 class Mutation(ObjectType):
     add_job = AddJob.Field()
     update_job = UpdateJob.Field()
     delete_job = DeleteJob.Field()
+    add_employer = AddEmployer.Field()
