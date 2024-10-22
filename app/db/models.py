@@ -13,7 +13,7 @@ class Employer(Base):
     name = Column(String)
     contact_email = Column(String)
     industry = Column(String)
-    jobs = relationship("Job", back_populates="employer")
+    jobs = relationship("Job", back_populates="employer", lazy="joined")
 
 
 class Job(Base):
@@ -22,4 +22,4 @@ class Job(Base):
     title = Column(String)
     description = Column(String)
     employer_id = Column(Integer, ForeignKey("employers.id"))
-    employer = relationship("Employer", back_populates="jobs")
+    employer = relationship("Employer", back_populates="jobs", lazy="joined")
