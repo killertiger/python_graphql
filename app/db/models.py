@@ -23,3 +23,12 @@ class Job(Base):
     description = Column(String)
     employer_id = Column(Integer, ForeignKey("employers.id"))
     employer = relationship("Employer", back_populates="jobs", lazy="joined")
+
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String)
+    email = Column(String)
+    password = Column(String)
+    role = Column(String)

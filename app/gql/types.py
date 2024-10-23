@@ -24,4 +24,10 @@ class JobObject(ObjectType):
     @staticmethod
     def resolve_employer(root: Job, info):
         return root.employer
-   
+
+
+class UserObject(ObjectType):
+    id = Int()
+    username = String()
+    email = String()
+    role = String()

@@ -108,3 +108,15 @@ mutation {
   }
 }
 ```
+
+Query Users:
+```
+query {
+  users {
+    id
+    username
+    email
+    role
+  }
+}
+```
