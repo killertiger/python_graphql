@@ -140,3 +140,12 @@ query
   }
 }
 ```
+
+Mutation LoginUser:
+```
+mutation {
+  loginUser(email: "john.doe@example.com", password: "hashed_password_1"){
+    token
+  }
+}
+```
