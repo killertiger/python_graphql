@@ -120,3 +120,23 @@ query {
   }
 }
 ```
+
+Query JobApplications:
+```
+query
+ {
+  jobApplications {
+    id
+    jobId
+    userId
+    user {
+      id
+      username
+    }
+    job {
+      id
+      title
+    }
+  }
+}
+```

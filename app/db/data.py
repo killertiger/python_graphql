@@ -91,3 +91,18 @@ users_data = [
         "role": "user",
     },
 ]
+
+job_applications_data = [
+    {
+        "user_id": 1,
+        "job_id": 1
+    },
+    {
+        "user_id": 2,
+        "job_id": 2
+    },
+    {
+        "user_id": 1,
+        "job_id": 3
+    },
+]
