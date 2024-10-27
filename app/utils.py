@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from functools import wraps
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
@@ -20,6 +21,7 @@ def generate_token(email: str) -> str:
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
     return token
+
 
 def get_authenticated_user(context) -> User:
     request_object = context.get('request')
@@ -61,3 +63,17 @@ def verify_password(pwd_hash: str, pwd: str) -> None:
         ph.verify(pwd_hash, pwd)
     except VerifyMismatchError:
         raise GraphQLError("Invalid password")
+
+
+def admin_user(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        info = args[1]
+        user = get_authenticated_user(info.context)
+
+        if user.role != "admin":
+            raise GraphQLError("You are not authorized to perform this action")
+
+        return func(*args, **kwargs)
+
+    return wrapper
