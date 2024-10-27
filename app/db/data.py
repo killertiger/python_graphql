@@ -56,35 +56,30 @@ jobs_data = [
 
 users_data = [
     {
-        "id": 1,
         "username": "john_doe",
         "email": "john.doe@example.com",
         "password": "plain_text_pass_1",
         "role": "admin",
     },
     {
-        "id": 2,
         "username": "jane_smith",
         "email": "jane.smith@example.com",
         "password": "plain_text_pass_2",
         "role": "user",
     },
     {
-        "id": 3,
         "username": "alice_johnson",
         "email": "alice.j@example.com",
         "password": "plain_text_pass_3",
         "role": "moderator",
     },
     {
-        "id": 4,
         "username": "bob_brown",
         "email": "bob.brown@example.com",
         "password": "hashed_password_4",
         "role": "user",
     },
     {
-        "id": 5,
         "username": "charlie_davis",
         "email": "charlie.d@example.com",
         "password": "hashed_password_5",

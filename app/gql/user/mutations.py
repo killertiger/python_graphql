@@ -1,8 +1,9 @@
-from graphene import Mutation, String
+from graphene import Field, Mutation, String
 from graphql import GraphQLError
 from app.db.database import Session
 from app.db.models import User
-from app.utils import generate_token, verify_password
+from app.gql.types import UserObject
+from app.utils import generate_token, hash_password, verify_password
 
 
 class LoginUser(Mutation):
@@ -27,3 +28,32 @@ class LoginUser(Mutation):
         token = generate_token(email)
 
         return LoginUser(token=token)
+
+
+class AddUser(Mutation):
+    class Arguments:
+        username = String(required=True)
+        email = String(required=True)
+        password = String(required=True)
+        role = String(required=True)
+
+    user = Field(lambda: UserObject)
+
+    @staticmethod
+    def mutate(root, info, username, email, password, role):
+        session = Session()
+        user = session.query(User).filter(User.email == email).first()
+
+        if user:
+            raise GraphQLError("A user with that email already exists")
+
+        password_hash = hash_password(password)
+
+        user = User(
+            username=username, email=email, password_hash=password_hash, role=role
+        )
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+
+        return AddUser(user=user)
