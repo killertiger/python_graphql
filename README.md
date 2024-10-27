@@ -167,3 +167,19 @@ mutation {
   }
 }
 ```
+
+Mutation ApplyToJob:
+```
+mutation {
+  applyToJob(
+    jobId: 1,
+    userId: 3
+  ) {
+    jobApplication {
+      id
+      userId
+      jobId
+    }
+  }
+}
+```

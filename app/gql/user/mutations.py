@@ -1,8 +1,8 @@
-from graphene import Field, Mutation, String
+from graphene import Field, Int, Mutation, String
 from graphql import GraphQLError
 from app.db.database import Session
-from app.db.models import User
-from app.gql.types import UserObject
+from app.db.models import JobApplication, User
+from app.gql.types import JobApplicationObject, UserObject
 from app.utils import (
     generate_token,
     get_authenticated_user,
@@ -67,3 +67,31 @@ class AddUser(Mutation):
         session.refresh(user)
 
         return AddUser(user=user)
+
+
+class ApplyToJob(Mutation):
+    class Arguments:
+        user_id = Int(required=True)
+        job_id = Int(required=True)
+
+    job_application = Field(lambda: JobApplicationObject)
+
+    @staticmethod
+    def mutate(root, info, user_id, job_id):
+        session = Session()
+        existing_application = (
+            session.query(JobApplication)
+            .filter(JobApplication.user_id == user_id, JobApplication.job_id == job_id)
+            .first()
+        )
+
+        if existing_application:
+            raise GraphQLError("This user has already applied to this job")
+        
+        job_application = JobApplication(user_id=user_id, job_id=job_id)
+        session.add(job_application)
+        session.commit()
+        session.refresh(job_application)
+        
+        return ApplyToJob(job_application=job_application)
+
