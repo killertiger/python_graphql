@@ -6,7 +6,7 @@ from starlette_graphene3 import (
     make_playground_handler,
 )
 from app.db.database import prepare_database
-from app.db.models import Employer, Job
+from app.db.models import Employer, Job, JobApplication
 from app.gql.queries import Query
 from app.gql.mutations import Mutation
 from app.db.database import Session
@@ -33,6 +33,13 @@ def get_jobs():
         return session.query(Job).all()
 
 
-app.mount('/', GraphQLApp(schema=schema, on_get=make_playground_handler()))
+@app.get("/apps")
+def get_applications():
+    with Session() as session:
+        return session.query(JobApplication).count()
+
 
 app.mount("/graphiql", GraphQLApp(schema=schema, on_get=make_graphiql_handler()))
+
+app.mount('/', GraphQLApp(schema=schema, on_get=make_playground_handler()))
+
