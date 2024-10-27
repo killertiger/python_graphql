@@ -3,6 +3,7 @@ from graphene import Boolean, Field, Int, Mutation, String
 from app.db.models import Employer
 from app.gql.types import EmployerObject
 from app.db.database import Session
+from app.utils import get_authenticated_user
 
 
 class AddEmployer(Mutation):
@@ -13,14 +14,20 @@ class AddEmployer(Mutation):
 
     employer = Field(lambda: EmployerObject)
 
+    authenticated_as = Field(String)
+
     @staticmethod
     def mutate(root, info, name, contact_email, industry):
+        user = get_authenticated_user(info.context)
+
         session = Session()
         employer = Employer(name=name, contact_email=contact_email, industry=industry)
         session.add(employer)
         session.commit()
         session.refresh(employer)
-        return AddEmployer(employer=employer)
+        # return AddEmployer(employer=employer,)
+
+        return AddEmployer(employer=employer, authenticated_as=user.email)
 
 
 class UpdateEmployer(Mutation):

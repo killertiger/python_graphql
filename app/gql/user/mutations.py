@@ -1,32 +1,8 @@
-import string
-from random import choices
-from datetime import datetime, timedelta
 from graphene import Mutation, String
 from graphql import GraphQLError
 from app.db.database import Session
 from app.db.models import User
-
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
-
-from app.settings.config import ALGORITHM, SECRET_KEY, TOKEN_EXPIRATION_TIME_MINUTES
-
-ph = PasswordHasher()
-
-
-import jwt
-
-
-def generate_token(email):
-    expiration_time = datetime.utcnow() + timedelta(
-        minutes=TOKEN_EXPIRATION_TIME_MINUTES
-    )
-
-    payload = {"sub": email, "exp": expiration_time}
-
-    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-
-    return token
+from app.utils import generate_token, verify_password
 
 
 class LoginUser(Mutation):
@@ -45,10 +21,7 @@ class LoginUser(Mutation):
         if not user:
             raise GraphQLError("A user by that email does not exist")
 
-        try:
-            ph.verify(user.password_hash, password)
-        except VerifyMismatchError:
-            raise GraphQLError("Invalid password")
+        verify_password(user.password_hash, password)
 
         # token = ''.join(choices(string.ascii_lowercase, k=10))
         token = generate_token(email)
