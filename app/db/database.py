@@ -3,7 +3,9 @@ from sqlalchemy.orm import sessionmaker
 from app.settings.config import DB_URL
 from app.db.models import Base, Employer, Job, JobApplication, User
 from app.db.data import employers_data, jobs_data, users_data, job_applications_data
+from argon2 import PasswordHasher
 
+ph = PasswordHasher()
 
 engine = create_engine(DB_URL, echo=True)
 Session = sessionmaker(bind=engine)
@@ -25,6 +27,8 @@ def prepare_database():
         session.add(Job(**job))
 
     for user in users_data:
+        user["password_hash"] = ph.hash(user["password"])
+        del user["password"]
         session.add(User(**user))
 
     for job_application in job_applications_data:
