@@ -3,7 +3,12 @@ from graphql import GraphQLError
 from app.db.database import Session
 from app.db.models import User
 from app.gql.types import UserObject
-from app.utils import generate_token, hash_password, verify_password
+from app.utils import (
+    generate_token,
+    get_authenticated_user,
+    hash_password,
+    verify_password,
+)
 
 
 class LoginUser(Mutation):
@@ -41,6 +46,11 @@ class AddUser(Mutation):
 
     @staticmethod
     def mutate(root, info, username, email, password, role):
+        if role == "admin":
+            current_user = get_authenticated_user(info.context)
+            if current_user.role != "admin":
+                raise GraphQLError("Only admin users can add new admin users")
+
         session = Session()
         user = session.query(User).filter(User.email == email).first()
 

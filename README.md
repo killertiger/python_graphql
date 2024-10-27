@@ -149,3 +149,21 @@ mutation {
   }
 }
 ```
+
+Mutation AddUser:
+```
+mutation {
+  addUser(
+    username: "new_user",
+    email: "test@example.com",
+    password: "new_pass",
+    role: "role") {
+    user {
+      id
+      username
+      email
+      role
+    }
+  }
+}
+```
