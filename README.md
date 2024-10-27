@@ -3,7 +3,9 @@ Based on: [Building GraphQL APIs with Python: Beginner To Pro](https://bairesdev
 
 # apps
 
-## introduction_app
+# deployment
+
+Use vercel.com
 
 # Install
 
