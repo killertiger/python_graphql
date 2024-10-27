@@ -77,3 +77,14 @@ def admin_user(func):
         return func(*args, **kwargs)
 
     return wrapper
+
+
+def authd_user(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        info = args[1]
+        get_authenticated_user(info.context)
+
+        return func(*args, **kwargs)
+
+    return wrapper
