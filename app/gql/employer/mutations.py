@@ -3,7 +3,7 @@ from graphene import Boolean, Field, Int, Mutation, String
 from app.db.models import Employer
 from app.gql.types import EmployerObject
 from app.db.database import Session
-from app.utils import get_authenticated_user
+from app.utils import admin_user
 
 
 class AddEmployer(Mutation):
@@ -14,20 +14,15 @@ class AddEmployer(Mutation):
 
     employer = Field(lambda: EmployerObject)
 
-    authenticated_as = Field(String)
-
-    @staticmethod
+    @admin_user
     def mutate(root, info, name, contact_email, industry):
-        user = get_authenticated_user(info.context)
-
         session = Session()
         employer = Employer(name=name, contact_email=contact_email, industry=industry)
         session.add(employer)
         session.commit()
         session.refresh(employer)
-        # return AddEmployer(employer=employer,)
 
-        return AddEmployer(employer=employer, authenticated_as=user.email)
+        return AddEmployer(employer=employer)
 
 
 class UpdateEmployer(Mutation):
@@ -39,7 +34,7 @@ class UpdateEmployer(Mutation):
 
     employer = Field(lambda: EmployerObject)
 
-    @staticmethod
+    @admin_user
     def mutate(root, info, employer_id, name=None, contact_email=None, industry=None):
         session = Session()
 
@@ -67,7 +62,7 @@ class DeleteEmployer(Mutation):
 
     success = Boolean()
 
-    @staticmethod
+    @admin_user
     def mutate(root, info, id):
         session = Session()
         employer = session.query(Employer).filter(Employer.id == id).first()
