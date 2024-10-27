@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from functools import wraps
+import os
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
@@ -8,7 +9,14 @@ import jwt
 
 from app.db.models import User
 from app.db.database import Session
-from app.settings.config import ALGORITHM, SECRET_KEY, TOKEN_EXPIRATION_TIME_MINUTES
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# DB_URL = "postgresql+psycopg://postgres:postgres@localhost:5432/graphqldb"
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+TOKEN_EXPIRATION_TIME_MINUTES = int(os.getenv("TOKEN_EXPIRATION_TIME_MINUTES"))
 
 
 def generate_token(email: str) -> str:
@@ -27,12 +35,12 @@ def get_authenticated_user(context) -> User:
     request_object = context.get('request')
     auth_header = request_object.headers.get('Authorization')
 
-    token = [None]
+    header_token = [None]
     if auth_header:
-        token = auth_header.split(" ")
+        header_token = auth_header.split(" ")
 
-    if auth_header and token[0] == "Bearer" and len(token) == 2:
-        token = token[1]
+    if auth_header and header_token[0] == "Bearer" and len(header_token) == 2:
+        token = header_token[1]
 
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
