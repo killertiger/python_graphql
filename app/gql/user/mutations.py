@@ -4,7 +4,7 @@ from app.db.database import Session
 from app.db.models import JobApplication, User
 from app.gql.types import JobApplicationObject, UserObject
 from app.utils import (
-    authd_user,
+    authd_user_same_as,
     generate_token,
     get_authenticated_user,
     hash_password,
@@ -77,7 +77,7 @@ class ApplyToJob(Mutation):
 
     job_application = Field(lambda: JobApplicationObject)
 
-    @authd_user
+    @authd_user_same_as
     def mutate(root, info, user_id, job_id):
         session = Session()
         existing_application = (
