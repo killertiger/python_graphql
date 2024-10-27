@@ -27,8 +27,12 @@ def get_authenticated_user(context) -> User:
     request_object = context.get('request')
     auth_header = request_object.headers.get('Authorization')
 
+    token = [None]
     if auth_header:
-        token = auth_header.split(" ")[1]
+        token = auth_header.split(" ")
+
+    if auth_header and token[0] == "Bearer" and len(token) == 2:
+        token = token[1]
 
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -45,8 +49,10 @@ def get_authenticated_user(context) -> User:
                 raise GraphQLError("Could not authenticate user")
             return user
 
-        except jwt.exceptions.InvalidSignatureError:
+        except jwt.exceptions.PyJWKError:
             raise GraphQLError("Invalid authentication token")
+        except Exception:
+            raise GraphQLError("Could not authenticate user")
     else:
         raise GraphQLError("Missing authentication token")
 
