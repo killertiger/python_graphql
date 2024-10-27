@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 Create .env file:
 ```
-DB_URL="postgresql+psycopg://postgres:postgres@localhost:5432/graphqldb"
+DB_URL="postgresql://postgres:postgres@localhost:5432/graphqldb"
 SECRET_KEY="job_board_app_secret!"
 ALGORITHM="HS256"
 TOKEN_EXPIRATION_TIME_MINUTES=25
@@ -34,7 +34,7 @@ python main.py
 
 # Running
 ```bash
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 ```
 
 
